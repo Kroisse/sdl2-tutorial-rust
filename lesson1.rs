@@ -112,10 +112,10 @@ mod ll {
 
 struct Window {
     p_window: *ll::SDL_Window,
-    renderers: ~[Renderer],
 }
 
-struct Renderer {
+struct Renderer<'self> {
+    parent: &'self Window,
     p_renderer: *ll::SDL_Renderer,
 }
 
@@ -124,7 +124,7 @@ struct Surface {
 }
 
 struct Texture<'self> {
-    parent: &'self Renderer,
+    parent: &'self Renderer<'self>,
     p_texture: *ll::SDL_Texture,
 }
 
@@ -157,25 +157,24 @@ impl Window {
             if ptr::is_null(p) {
                 return Err(from_c_str(ll::SDL_GetError()));
             }
-            Ok(~Window{ p_window: p, renderers: ~[] })
+            Ok(~Window{ p_window: p })
         }
     }
 
     #[fixed_stack_segment]
-    fn create_renderer<'a>(&'a mut self, index: int) -> Result<&'a mut Renderer, ~str> {
+    fn create_renderer<'a>(&'a self, index: int) -> Result<~Renderer<'a>, ~str> {
         unsafe {
             let flags = ll::SDL_RendererFlags::SDL_RENDERER_ACCELERATED | ll::SDL_RendererFlags::SDL_RENDERER_PRESENTVSYNC;
             let p = ll::SDL_CreateRenderer(self.p_window, index as c_int, flags);
             if ptr::is_null(p) {
                 return Err(from_c_str(ll::SDL_GetError()));
             }
-            self.renderers.unshift(Renderer{ p_renderer: p });
-            Ok(&mut self.renderers[0])
+            Ok(~Renderer{ parent: self, p_renderer: p })
         }
     }
 }
 
-impl Renderer {
+impl<'self> Renderer<'self> {
     #[fixed_stack_segment]
     fn create_texture_from_surface<'a>(&'a self, surface: &Surface) -> Result<~Texture<'a>, ~str> {
         unsafe {
@@ -218,7 +217,8 @@ impl Drop for Window {
     }
 }
 
-impl Drop for Renderer {
+#[unsafe_destructor]
+impl<'self> Drop for Renderer<'self> {
     #[fixed_stack_segment]
     fn drop(&self) {
         unsafe {
@@ -266,8 +266,8 @@ impl Surface {
 
 fn main() {
     init(ll::SDL_INIT_EVERYTHING).unwrap();
-    let mut w = Window::new("Title", 0, 0, 960, 640).unwrap();
-    let mut ren = w.create_renderer(-1).unwrap();
+    let w = Window::new("Title", 0, 0, 960, 640).unwrap();
+    let ren = w.create_renderer(-1).unwrap();
     let bmp = Surface::from_bmp(&Path("hello.bmp")).unwrap();
     let tex = ren.create_texture_from_surface(bmp).unwrap();
     ren.clear();
