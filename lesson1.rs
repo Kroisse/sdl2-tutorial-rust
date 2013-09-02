@@ -1,3 +1,8 @@
+/* http://twinklebeardev.blogspot.kr/2012/07/lesson-1-hello-world.html
+ * rustc 0.8-pre
+ * host: x86_64-apple-darwin
+ */
+
 use std::libc::{uint32_t, c_int};
 use std::str::raw::from_c_str;
 use std::c_str::ToCStr;
