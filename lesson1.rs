@@ -100,7 +100,7 @@ mod ll {
 
         fn SDL_RWFromFile(file: *c_char, mode: *c_char) -> *SDL_RWops;
 
-        fn SDL_LoadBMP_RW(src: *SDL_RWops, freesrc: int) -> *SDL_Surface;
+        fn SDL_LoadBMP_RW(src: *SDL_RWops, freesrc: c_int) -> *SDL_Surface;
         fn SDL_FreeSurface(surface: *SDL_Surface);
 
         fn SDL_CreateTextureFromSurface(renderer: *SDL_Renderer, surface: *SDL_Surface) -> *SDL_Texture;
