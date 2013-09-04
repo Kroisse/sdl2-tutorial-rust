@@ -65,6 +65,11 @@ pub fn init(flags: InitFlagSet) -> Result<(), ~str> {
 }
 
 #[fixed_stack_segment]
+pub fn quit() {
+    unsafe { ll::SDL_Quit(); }
+}
+
+#[fixed_stack_segment]
 pub fn delay(ms: uint) {
     unsafe {
         ll::SDL_Delay(ms as uint32_t);

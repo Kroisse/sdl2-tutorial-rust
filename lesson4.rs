@@ -45,4 +45,5 @@ fn main() {
         render_texture(image, ren, (0, 0));
         ren.present();
     }
+    sdl::quit();
 }
