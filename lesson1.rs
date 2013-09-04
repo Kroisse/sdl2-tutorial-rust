@@ -9,7 +9,7 @@ fn main() {
     sdl::init(sdl::SDL_INIT_EVERYTHING()).unwrap();
     let w = sdl::Window::new("Title", 0, 0, 960, 640).unwrap();
     let ren = w.create_renderer(-1).unwrap();
-    let bmp = sdl::Surface::from_bmp(&Path("hello.bmp")).unwrap();
+    let bmp = sdl::Surface::from_bmp(&Path("Lesson1res/hello.bmp")).unwrap();
     let tex = ren.create_texture_from_surface(bmp).unwrap();
     ren.clear();
     ren.copy_(tex, None);
