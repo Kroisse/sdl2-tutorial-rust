@@ -12,7 +12,7 @@ fn main() {
     let bmp = sdl::Surface::from_bmp(&Path("hello.bmp")).unwrap();
     let tex = ren.create_texture_from_surface(bmp).unwrap();
     ren.clear();
-    ren.copy_(tex);
+    ren.copy_(tex, None);
     ren.present();
     sdl::delay(2000);
     println("Hello?");

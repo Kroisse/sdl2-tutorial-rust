@@ -7,6 +7,12 @@ mod ll;
 
 #[link_args="-framework SDL2"] extern {}
 
+pub type Rect = ll::SDL_Rect;
+
+pub fn Rect(x: int, y: int, w: uint, h: uint) -> Rect {
+    ll::Struct_SDL_Rect { x: x as c_int, y: y as c_int, w: w as c_int, h: h as c_int }
+}
+
 pub struct Window {
     priv p_window: *mut ll::SDL_Window,
 }
@@ -95,7 +101,7 @@ pub fn delay(ms: uint) {
 
 impl Window {
     #[fixed_stack_segment]
-    pub fn new(title: &str, x: int, y: int, w: int, h: int) -> Result<~Window, ~str> {
+    pub fn new(title: &str, x: int, y: int, w: uint, h: uint) -> Result<~Window, ~str> {
         unsafe {
             let p = title.with_c_str(|title| ll::SDL_CreateWindow(title,
                                                                   x as c_int, y as c_int,
@@ -141,9 +147,13 @@ impl<'self> Renderer<'self> {
     }
 
     #[fixed_stack_segment]
-    pub fn copy_(&self, texture: &Texture) {
+    pub fn copy_(&self, texture: &Texture, dest: Option<&Rect>) {
         unsafe {
-            ll::SDL_RenderCopy(self.p_renderer, texture.p_texture, ptr::null(), ptr::null());
+            let p_dest = match dest {
+                Some(rect) => ptr::to_unsafe_ptr(rect),
+                None => ptr::null(),
+            };
+            ll::SDL_RenderCopy(self.p_renderer, texture.p_texture, ptr::null(), p_dest);
         }
     }
 
@@ -152,6 +162,21 @@ impl<'self> Renderer<'self> {
         unsafe {
             ll::SDL_RenderPresent(self.p_renderer);
         }
+    }
+}
+
+impl<'self> Texture<'self> {
+    #[fixed_stack_segment]
+    pub fn size(&self) -> (uint, uint) {
+        let mut w = 0;
+        let mut h = 0;
+        unsafe {
+            ll::SDL_QueryTexture(self.p_texture,
+                                 ptr::mut_null(), ptr::mut_null(),
+                                 ptr::to_mut_unsafe_ptr(&mut w),
+                                 ptr::to_mut_unsafe_ptr(&mut h));
+        }
+        (w as uint, h as uint)
     }
 }
 
