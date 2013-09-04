@@ -3,17 +3,20 @@
  * host: x86_64-apple-darwin
  */
 
+use sdl::window::{Window};
+use sdl::render::{Renderer, Texture};
+use sdl::surface::Surface;
 mod sdl;
 
 static SCREEN_RESOLUTION: (uint, uint) = (960, 640);
 
-fn load_image<'a>(renderer: &'a sdl::Renderer, file: &Path) -> Result<~sdl::Texture<'a>, ~str> {
-    do sdl::Surface::from_bmp(file).chain |image| {
+fn load_image<'a>(renderer: &'a Renderer, file: &Path) -> Result<~Texture<'a>, ~str> {
+    do Surface::from_bmp(file).chain |image| {
         renderer.create_texture_from_surface(image)
     }
 }
 
-fn apply_surface(x: int, y: int, texture: &sdl::Texture, renderer: &sdl::Renderer) {
+fn apply_surface(x: int, y: int, texture: &Texture, renderer: &Renderer) {
     let (w, h) = texture.size();
     let rect = sdl::Rect(x, y, w, h);
     renderer.copy_(texture, Some(&rect));
@@ -22,7 +25,7 @@ fn apply_surface(x: int, y: int, texture: &sdl::Texture, renderer: &sdl::Rendere
 fn main() {
     sdl::init(sdl::SDL_INIT_EVERYTHING()).unwrap();
     let w = match SCREEN_RESOLUTION {
-        (w, h) => sdl::Window::new("Lesson 2", 0, 0, w, h).unwrap()
+        (w, h) => Window::new("Lesson 2", 0, 0, w, h).unwrap()
     };
     let ren = w.create_renderer(-1).unwrap();
     let background = load_image(ren, &Path("Lesson2res/background.bmp")).unwrap();
