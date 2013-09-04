@@ -10,28 +10,57 @@ use std::ptr;
 
 mod ll;
 
+#[link_args="-framework SDL2"] extern {}
+
 struct Window {
-    p_window: *ll::SDL_Window,
+    p_window: *mut ll::SDL_Window,
 }
 
 struct Renderer<'self> {
     parent: &'self Window,
-    p_renderer: *ll::SDL_Renderer,
+    p_renderer: *mut ll::SDL_Renderer,
 }
 
 struct Surface {
-    p_surface: *ll::SDL_Surface,
+    p_surface: *mut ll::SDL_Surface,
 }
 
 struct Texture<'self> {
     parent: &'self Renderer<'self>,
-    p_texture: *ll::SDL_Texture,
+    p_texture: *mut ll::SDL_Texture,
 }
 
+
+struct InitFlag(u32);
+impl BitOr<InitFlag, InitFlag> for InitFlag {
+    fn bitor(&self, rhs: &InitFlag) -> InitFlag {
+        match (self, rhs) {
+            (&InitFlag(a), &InitFlag(b)) => InitFlag(a | b)
+        }
+    }
+}
+
+static SDL_INIT_TIMER: InitFlag = InitFlag(0x00000001);
+static SDL_INIT_AUDIO: InitFlag = InitFlag(0x00000010);
+/**< SDL_INIT_VIDEO implies SDL_INIT_EVENTS */
+static SDL_INIT_VIDEO: InitFlag = InitFlag(0x00000020);
+/**< SDL_INIT_JOYSTICK implies SDL_INIT_EVENTS */
+static SDL_INIT_JOYSTICK: InitFlag = InitFlag(0x00000200);
+static SDL_INIT_HAPTIC: InitFlag = InitFlag(0x00001000);
+/**< SDL_INIT_GAMECONTROLLER implies SDL_INIT_JOYSTICK */
+static SDL_INIT_GAMECONTROLLER: InitFlag = InitFlag(0x00002000);
+static SDL_INIT_EVENTS: InitFlag = InitFlag(0x00004000);
+/**< Don't catch fatal signals */
+static SDL_INIT_NOPARACHUTE: InitFlag = InitFlag(0x00100000);
+
+
 #[fixed_stack_segment]
-fn init(flags: uint32_t) -> Result<(), ~str> {
+fn init(flags: InitFlag) -> Result<(), ~str> {
+    let raw_flag = match flags {
+        InitFlag(f) => f as uint32_t
+    };
     unsafe {
-        if ll::SDL_Init(flags) < 0 {
+        if ll::SDL_Init(raw_flag) < 0 {
             let msg = ll::SDL_GetError();
             return Err(from_c_str(msg));
         }
@@ -53,7 +82,7 @@ impl Window {
             let p = title.with_c_str(|title| ll::SDL_CreateWindow(title,
                                                                   x as c_int, y as c_int,
                                                                   w as c_int, h as c_int,
-                                                                  ll::SDL_WindowFlags::SDL_WINDOW_SHOWN));
+                                                                  ll::SDL_WINDOW_SHOWN));
             if ptr::is_null(p) {
                 return Err(from_c_str(ll::SDL_GetError()));
             }
@@ -64,7 +93,7 @@ impl Window {
     #[fixed_stack_segment]
     fn create_renderer<'a>(&'a self, index: int) -> Result<~Renderer<'a>, ~str> {
         unsafe {
-            let flags = ll::SDL_RendererFlags::SDL_RENDERER_ACCELERATED | ll::SDL_RendererFlags::SDL_RENDERER_PRESENTVSYNC;
+            let flags = ll::SDL_RENDERER_ACCELERATED | ll::SDL_RENDERER_PRESENTVSYNC;
             let p = ll::SDL_CreateRenderer(self.p_window, index as c_int, flags);
             if ptr::is_null(p) {
                 return Err(from_c_str(ll::SDL_GetError()));
@@ -165,7 +194,9 @@ impl Surface {
 }
 
 fn main() {
-    init(ll::SDL_INIT_EVERYTHING).unwrap();
+    let SDL_INIT_EVERYTHING: InitFlag = SDL_INIT_TIMER | SDL_INIT_AUDIO | SDL_INIT_VIDEO | SDL_INIT_EVENTS |
+                                        SDL_INIT_JOYSTICK | SDL_INIT_HAPTIC | SDL_INIT_GAMECONTROLLER;
+    init(SDL_INIT_EVERYTHING).unwrap();
     let w = Window::new("Title", 0, 0, 960, 640).unwrap();
     let ren = w.create_renderer(-1).unwrap();
     let bmp = Surface::from_bmp(&Path("hello.bmp")).unwrap();
