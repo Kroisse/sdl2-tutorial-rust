@@ -91,13 +91,13 @@ pub struct Union_Unnamed1 {
 }
 impl Union_Unnamed1 {
     pub fn stdio(&mut self) -> *mut Struct_Unnamed2 {
-        unsafe { std::cast::transmute(&std::ptr::to_mut_unsafe_ptr(self)) }
+        unsafe { std::cast::transmute(std::ptr::to_mut_unsafe_ptr(self)) }
     }
     pub fn mem(&mut self) -> *mut Struct_Unnamed3 {
-        unsafe { std::cast::transmute(&std::ptr::to_mut_unsafe_ptr(self)) }
+        unsafe { std::cast::transmute(std::ptr::to_mut_unsafe_ptr(self)) }
     }
     pub fn unknown(&mut self) -> *mut Struct_Unnamed4 {
-        unsafe { std::cast::transmute(&std::ptr::to_mut_unsafe_ptr(self)) }
+        unsafe { std::cast::transmute(std::ptr::to_mut_unsafe_ptr(self)) }
     }
 }
 pub struct Struct_Unnamed2 {
@@ -917,13 +917,13 @@ pub struct Union_Unnamed12 {
 }
 impl Union_Unnamed12 {
     pub fn button(&mut self) -> *mut c_int {
-        unsafe { std::cast::transmute(&std::ptr::to_mut_unsafe_ptr(self)) }
+        unsafe { std::cast::transmute(std::ptr::to_mut_unsafe_ptr(self)) }
     }
     pub fn axis(&mut self) -> *mut c_int {
-        unsafe { std::cast::transmute(&std::ptr::to_mut_unsafe_ptr(self)) }
+        unsafe { std::cast::transmute(std::ptr::to_mut_unsafe_ptr(self)) }
     }
     pub fn hat(&mut self) -> *mut Struct_Unnamed13 {
-        unsafe { std::cast::transmute(&std::ptr::to_mut_unsafe_ptr(self)) }
+        unsafe { std::cast::transmute(std::ptr::to_mut_unsafe_ptr(self)) }
     }
 }
 pub struct Struct_Unnamed13 {
@@ -1239,79 +1239,79 @@ pub struct Union_SDL_Event {
 }
 impl Union_SDL_Event {
     pub fn _type(&mut self) -> *mut Uint32 {
-        unsafe { std::cast::transmute(&std::ptr::to_mut_unsafe_ptr(self)) }
+        unsafe { std::cast::transmute(std::ptr::to_mut_unsafe_ptr(self)) }
     }
     pub fn common(&mut self) -> *mut SDL_CommonEvent {
-        unsafe { std::cast::transmute(&std::ptr::to_mut_unsafe_ptr(self)) }
+        unsafe { std::cast::transmute(std::ptr::to_mut_unsafe_ptr(self)) }
     }
     pub fn window(&mut self) -> *mut SDL_WindowEvent {
-        unsafe { std::cast::transmute(&std::ptr::to_mut_unsafe_ptr(self)) }
+        unsafe { std::cast::transmute(std::ptr::to_mut_unsafe_ptr(self)) }
     }
     pub fn key(&mut self) -> *mut SDL_KeyboardEvent {
-        unsafe { std::cast::transmute(&std::ptr::to_mut_unsafe_ptr(self)) }
+        unsafe { std::cast::transmute(std::ptr::to_mut_unsafe_ptr(self)) }
     }
     pub fn edit(&mut self) -> *mut SDL_TextEditingEvent {
-        unsafe { std::cast::transmute(&std::ptr::to_mut_unsafe_ptr(self)) }
+        unsafe { std::cast::transmute(std::ptr::to_mut_unsafe_ptr(self)) }
     }
     pub fn text(&mut self) -> *mut SDL_TextInputEvent {
-        unsafe { std::cast::transmute(&std::ptr::to_mut_unsafe_ptr(self)) }
+        unsafe { std::cast::transmute(std::ptr::to_mut_unsafe_ptr(self)) }
     }
     pub fn motion(&mut self) -> *mut SDL_MouseMotionEvent {
-        unsafe { std::cast::transmute(&std::ptr::to_mut_unsafe_ptr(self)) }
+        unsafe { std::cast::transmute(std::ptr::to_mut_unsafe_ptr(self)) }
     }
     pub fn button(&mut self) -> *mut SDL_MouseButtonEvent {
-        unsafe { std::cast::transmute(&std::ptr::to_mut_unsafe_ptr(self)) }
+        unsafe { std::cast::transmute(std::ptr::to_mut_unsafe_ptr(self)) }
     }
     pub fn wheel(&mut self) -> *mut SDL_MouseWheelEvent {
-        unsafe { std::cast::transmute(&std::ptr::to_mut_unsafe_ptr(self)) }
+        unsafe { std::cast::transmute(std::ptr::to_mut_unsafe_ptr(self)) }
     }
     pub fn jaxis(&mut self) -> *mut SDL_JoyAxisEvent {
-        unsafe { std::cast::transmute(&std::ptr::to_mut_unsafe_ptr(self)) }
+        unsafe { std::cast::transmute(std::ptr::to_mut_unsafe_ptr(self)) }
     }
     pub fn jball(&mut self) -> *mut SDL_JoyBallEvent {
-        unsafe { std::cast::transmute(&std::ptr::to_mut_unsafe_ptr(self)) }
+        unsafe { std::cast::transmute(std::ptr::to_mut_unsafe_ptr(self)) }
     }
     pub fn jhat(&mut self) -> *mut SDL_JoyHatEvent {
-        unsafe { std::cast::transmute(&std::ptr::to_mut_unsafe_ptr(self)) }
+        unsafe { std::cast::transmute(std::ptr::to_mut_unsafe_ptr(self)) }
     }
     pub fn jbutton(&mut self) -> *mut SDL_JoyButtonEvent {
-        unsafe { std::cast::transmute(&std::ptr::to_mut_unsafe_ptr(self)) }
+        unsafe { std::cast::transmute(std::ptr::to_mut_unsafe_ptr(self)) }
     }
     pub fn jdevice(&mut self) -> *mut SDL_JoyDeviceEvent {
-        unsafe { std::cast::transmute(&std::ptr::to_mut_unsafe_ptr(self)) }
+        unsafe { std::cast::transmute(std::ptr::to_mut_unsafe_ptr(self)) }
     }
     pub fn caxis(&mut self) -> *mut SDL_ControllerAxisEvent {
-        unsafe { std::cast::transmute(&std::ptr::to_mut_unsafe_ptr(self)) }
+        unsafe { std::cast::transmute(std::ptr::to_mut_unsafe_ptr(self)) }
     }
     pub fn cbutton(&mut self) -> *mut SDL_ControllerButtonEvent {
-        unsafe { std::cast::transmute(&std::ptr::to_mut_unsafe_ptr(self)) }
+        unsafe { std::cast::transmute(std::ptr::to_mut_unsafe_ptr(self)) }
     }
     pub fn cdevice(&mut self) -> *mut SDL_ControllerDeviceEvent {
-        unsafe { std::cast::transmute(&std::ptr::to_mut_unsafe_ptr(self)) }
+        unsafe { std::cast::transmute(std::ptr::to_mut_unsafe_ptr(self)) }
     }
     pub fn quit(&mut self) -> *mut SDL_QuitEvent {
-        unsafe { std::cast::transmute(&std::ptr::to_mut_unsafe_ptr(self)) }
+        unsafe { std::cast::transmute(std::ptr::to_mut_unsafe_ptr(self)) }
     }
     pub fn user(&mut self) -> *mut SDL_UserEvent {
-        unsafe { std::cast::transmute(&std::ptr::to_mut_unsafe_ptr(self)) }
+        unsafe { std::cast::transmute(std::ptr::to_mut_unsafe_ptr(self)) }
     }
     pub fn syswm(&mut self) -> *mut SDL_SysWMEvent {
-        unsafe { std::cast::transmute(&std::ptr::to_mut_unsafe_ptr(self)) }
+        unsafe { std::cast::transmute(std::ptr::to_mut_unsafe_ptr(self)) }
     }
     pub fn tfinger(&mut self) -> *mut SDL_TouchFingerEvent {
-        unsafe { std::cast::transmute(&std::ptr::to_mut_unsafe_ptr(self)) }
+        unsafe { std::cast::transmute(std::ptr::to_mut_unsafe_ptr(self)) }
     }
     pub fn mgesture(&mut self) -> *mut SDL_MultiGestureEvent {
-        unsafe { std::cast::transmute(&std::ptr::to_mut_unsafe_ptr(self)) }
+        unsafe { std::cast::transmute(std::ptr::to_mut_unsafe_ptr(self)) }
     }
     pub fn dgesture(&mut self) -> *mut SDL_DollarGestureEvent {
-        unsafe { std::cast::transmute(&std::ptr::to_mut_unsafe_ptr(self)) }
+        unsafe { std::cast::transmute(std::ptr::to_mut_unsafe_ptr(self)) }
     }
     pub fn drop(&mut self) -> *mut SDL_DropEvent {
-        unsafe { std::cast::transmute(&std::ptr::to_mut_unsafe_ptr(self)) }
+        unsafe { std::cast::transmute(std::ptr::to_mut_unsafe_ptr(self)) }
     }
     pub fn padding(&mut self) -> *mut [Uint8, ..56u] {
-        unsafe { std::cast::transmute(&std::ptr::to_mut_unsafe_ptr(self)) }
+        unsafe { std::cast::transmute(std::ptr::to_mut_unsafe_ptr(self)) }
     }
 }
 pub type SDL_Event = Union_SDL_Event;
@@ -1418,25 +1418,25 @@ pub struct Union_SDL_HapticEffect {
 }
 impl Union_SDL_HapticEffect {
     pub fn _type(&mut self) -> *mut Uint16 {
-        unsafe { std::cast::transmute(&std::ptr::to_mut_unsafe_ptr(self)) }
+        unsafe { std::cast::transmute(std::ptr::to_mut_unsafe_ptr(self)) }
     }
     pub fn constant(&mut self) -> *mut SDL_HapticConstant {
-        unsafe { std::cast::transmute(&std::ptr::to_mut_unsafe_ptr(self)) }
+        unsafe { std::cast::transmute(std::ptr::to_mut_unsafe_ptr(self)) }
     }
     pub fn periodic(&mut self) -> *mut SDL_HapticPeriodic {
-        unsafe { std::cast::transmute(&std::ptr::to_mut_unsafe_ptr(self)) }
+        unsafe { std::cast::transmute(std::ptr::to_mut_unsafe_ptr(self)) }
     }
     pub fn condition(&mut self) -> *mut SDL_HapticCondition {
-        unsafe { std::cast::transmute(&std::ptr::to_mut_unsafe_ptr(self)) }
+        unsafe { std::cast::transmute(std::ptr::to_mut_unsafe_ptr(self)) }
     }
     pub fn ramp(&mut self) -> *mut SDL_HapticRamp {
-        unsafe { std::cast::transmute(&std::ptr::to_mut_unsafe_ptr(self)) }
+        unsafe { std::cast::transmute(std::ptr::to_mut_unsafe_ptr(self)) }
     }
     pub fn leftright(&mut self) -> *mut SDL_HapticLeftRight {
-        unsafe { std::cast::transmute(&std::ptr::to_mut_unsafe_ptr(self)) }
+        unsafe { std::cast::transmute(std::ptr::to_mut_unsafe_ptr(self)) }
     }
     pub fn custom(&mut self) -> *mut SDL_HapticCustom {
-        unsafe { std::cast::transmute(&std::ptr::to_mut_unsafe_ptr(self)) }
+        unsafe { std::cast::transmute(std::ptr::to_mut_unsafe_ptr(self)) }
     }
 }
 pub type SDL_HapticEffect = Union_SDL_HapticEffect;
