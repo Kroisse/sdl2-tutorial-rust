@@ -1235,7 +1235,7 @@ pub struct Struct_SDL_SysWMEvent {
 }
 pub type SDL_SysWMEvent = Struct_SDL_SysWMEvent;
 pub struct Union_SDL_Event {
-    data: [c_uchar, ..32u],
+    data: [Uint8, ..56u],
 }
 impl Union_SDL_Event {
     pub fn _type(&mut self) -> *mut Uint32 {

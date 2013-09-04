@@ -5,6 +5,7 @@ pub mod rect;
 pub mod window;
 pub mod render;
 pub mod surface;
+pub mod events;
 
 pub mod global;
 
