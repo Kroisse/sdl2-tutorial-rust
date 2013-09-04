@@ -9,12 +9,12 @@ use super::surface::Surface;
 
 pub struct Renderer<'self> {
     priv parent: &'self super::window::Window,
-    priv p_renderer: *mut ll::SDL_Renderer,
+    p_renderer: *mut ll::SDL_Renderer,
 }
 
 pub struct Texture<'self> {
-    priv parent: &'self Renderer<'self>,
-    priv p_texture: *mut ll::SDL_Texture,
+    parent: &'self Renderer<'self>,
+    p_texture: *mut ll::SDL_Texture,
 }
 
 impl<'self> Renderer<'self> {
