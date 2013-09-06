@@ -1,20 +1,12 @@
 use std::ptr;
 use std::cast;
+use std::libc::{c_uint};
 use super::ll;
 
 type Timestamp = u32;
+type WindowID = u32;
 /*
 pub struct CommonEvent { timestamp: Timestamp }
-pub struct WindowEvent {
-    timestamp: Timestamp,
-    windowID: Uint32,
-    event: Uint8,
-    padding1: Uint8,
-    padding2: Uint8,
-    padding3: Uint8,
-    data1: Sint32,
-    data2: Sint32,
-}
 pub struct KeyboardEvent {
     timestamp: Timestamp,
     windowID: Uint32,
@@ -186,7 +178,20 @@ pub enum Event {
     AppWillEnterForeground(Timestamp),
     AppDidEnterForeground(Timestamp),
     /* Window events */
-    WindowEvent(Timestamp),
+    WindowShown       {timestamp: Timestamp, window_id: WindowID},
+    WindowHidden      {timestamp: Timestamp, window_id: WindowID},
+    WindowExposed     {timestamp: Timestamp, window_id: WindowID},
+    WindowMoved       {timestamp: Timestamp, window_id: WindowID, position: (int, int)},
+    WindowResized     {timestamp: Timestamp, window_id: WindowID, size: (uint, uint)},
+    WindowSizeChanged {timestamp: Timestamp, window_id: WindowID},
+    WindowMinimized   {timestamp: Timestamp, window_id: WindowID},
+    WindowMaximized   {timestamp: Timestamp, window_id: WindowID},
+    WindowRestored    {timestamp: Timestamp, window_id: WindowID},
+    WindowEnter       {timestamp: Timestamp, window_id: WindowID},
+    WindowLeave       {timestamp: Timestamp, window_id: WindowID},
+    WindowFocusGained {timestamp: Timestamp, window_id: WindowID},
+    WindowFocusLost   {timestamp: Timestamp, window_id: WindowID},
+    WindowClose       {timestamp: Timestamp, window_id: WindowID},
     SysWMEvent(Timestamp),
     /* Keyboard events */
     KeyDown(Timestamp),
@@ -249,7 +254,7 @@ pub fn poll() -> Event {
             ll::SDL_APP_DIDENTERBACKGROUND => AppDidEnterBackground(timestamp),
             ll::SDL_APP_WILLENTERFOREGROUND => AppWillEnterForeground(timestamp),
             ll::SDL_APP_DIDENTERFOREGROUND => AppDidEnterForeground(timestamp),
-            ll::SDL_WINDOWEVENT => WindowEvent(timestamp),
+            ll::SDL_WINDOWEVENT => wrap_windowevent(*raw_event.window()),
             ll::SDL_SYSWMEVENT => SysWMEvent(timestamp),
             ll::SDL_KEYDOWN => KeyDown(timestamp),
             ll::SDL_KEYUP => KeyUp(timestamp),
@@ -282,6 +287,35 @@ pub fn poll() -> Event {
             ll::SDL_DROPFILE => DropFile(timestamp),
             ll::SDL_USEREVENT => UserEvent(timestamp),
             _ => fail!("std::events::poll() couldn't handle event type: %?", type_),
+        }
+    }
+}
+
+#[fixed_stack_segment]
+fn wrap_windowevent(raw_event: ll::SDL_WindowEvent) -> Event {
+    let e = raw_event;
+    let t = e.timestamp;
+    let w = e.windowID;
+    match e.event as c_uint {
+        ll::SDL_WINDOWEVENT_SHOWN =>        WindowShown       { timestamp: t, window_id: w},
+        ll::SDL_WINDOWEVENT_HIDDEN =>       WindowHidden      { timestamp: t, window_id: w},
+        ll::SDL_WINDOWEVENT_EXPOSED =>      WindowExposed     { timestamp: t, window_id: w},
+        ll::SDL_WINDOWEVENT_MOVED =>        WindowMoved       { timestamp: t, window_id: w,
+                                                                position: (e.data1 as int, e.data2 as int)},
+        ll::SDL_WINDOWEVENT_RESIZED =>      WindowResized     { timestamp: t, window_id: w,
+                                                                size: (e.data1 as uint, e.data2 as uint)},
+        ll::SDL_WINDOWEVENT_SIZE_CHANGED => WindowSizeChanged { timestamp: t, window_id: w},
+        ll::SDL_WINDOWEVENT_MINIMIZED =>    WindowMinimized   { timestamp: t, window_id: w},
+        ll::SDL_WINDOWEVENT_MAXIMIZED =>    WindowMaximized   { timestamp: t, window_id: w},
+        ll::SDL_WINDOWEVENT_RESTORED =>     WindowRestored    { timestamp: t, window_id: w},
+        ll::SDL_WINDOWEVENT_ENTER =>        WindowEnter       { timestamp: t, window_id: w},
+        ll::SDL_WINDOWEVENT_LEAVE =>        WindowLeave       { timestamp: t, window_id: w},
+        ll::SDL_WINDOWEVENT_FOCUS_GAINED => WindowFocusGained { timestamp: t, window_id: w},
+        ll::SDL_WINDOWEVENT_FOCUS_LOST =>   WindowFocusLost   { timestamp: t, window_id: w},
+        ll::SDL_WINDOWEVENT_CLOSE =>        WindowClose       { timestamp: t, window_id: w},
+        _ => {
+            debug!("std::events::wrap_windowevent() got unknown event %?", e);
+            NoEvent
         }
     }
 }
