@@ -236,11 +236,37 @@ pub enum Event {
     UserEvent(Timestamp),
 }
 
+fn null_event() -> ll::SDL_Event {
+    ll::Union_SDL_Event { data: [0u8, ..56] }
+}
+
+#[fixed_stack_segment]
+pub fn pump() {
+    unsafe { ll::SDL_PumpEvents(); }
+}
+
 #[fixed_stack_segment]
 pub fn poll() -> Event {
-    let mut event = ll::Union_SDL_Event { data: [0u8, ..56] };
+    let mut event = null_event();
+    let polled = unsafe { ll::SDL_PollEvent(&mut event) };
+    if polled == 0 {
+        return NoEvent;
+    }
+
+    wrap_event(event)
+}
+
+#[fixed_stack_segment]
+fn wrap_event(raw_event: ll::SDL_Event) -> Event {
+    let mut raw_event = raw_event;
     unsafe {
-        if ll::SDL_PollEvent(ptr::to_mut_unsafe_ptr(&mut event)) == 0 {
+        let type_ = raw_event._type();
+        let type_ = if ptr::is_null(type_) {
+            return NoEvent;
+        } else {
+            *type_
+        };
+        if type_ < ll::SDL_FIRSTEVENT || type_ > ll::SDL_LASTEVENT {
             return NoEvent;
         }
         let common: &ll::Struct_SDL_CommonEvent = cast::transmute(event.common());
