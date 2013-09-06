@@ -175,6 +175,7 @@ pub struct SysWMEvent {
 */
 
 pub enum Event {
+    NoEvent,
     /* Application events */
     Quit(Timestamp),
     /* These application events have special meaning on iOS, see README-ios.txt for details */
@@ -231,16 +232,16 @@ pub enum Event {
 }
 
 #[fixed_stack_segment]
-pub fn poll() -> Option<Event> {
+pub fn poll() -> Event {
     let mut event = ll::Union_SDL_Event { data: [0u8, ..56] };
     unsafe {
         if ll::SDL_PollEvent(ptr::to_mut_unsafe_ptr(&mut event)) == 0 {
-            return None;
+            return NoEvent;
         }
         let common: &ll::Struct_SDL_CommonEvent = cast::transmute(event.common());
         let timestamp = common.timestamp as Timestamp;
         let type_ = *event._type();
-        let result = match type_ {
+        match type_ {
             ll::SDL_QUIT => Quit(timestamp),
             ll::SDL_APP_TERMINATING => AppTerminating(timestamp),
             ll::SDL_APP_LOWMEMORY => AppLowMemory(timestamp),
@@ -281,7 +282,6 @@ pub fn poll() -> Option<Event> {
             ll::SDL_DROPFILE => DropFile(timestamp),
             ll::SDL_USEREVENT => UserEvent(timestamp),
             _ => fail!("std::events::poll() couldn't handle event type: %?", type_),
-        };
-        Some(result)
+        }
     }
 }

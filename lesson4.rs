@@ -34,10 +34,10 @@ fn main() {
     while (!quit) {
         loop {
             match events::poll() {
-                Some(events::Quit(_)) => quit = true,
-                Some(events::KeyDown(_)) => quit = true,
-                Some(events::MouseButtonDown(_)) => quit = true,
-                None => break,
+                events::Quit(_) => quit = true,
+                events::KeyDown(_) => quit = true,
+                events::MouseButtonDown(_) => quit = true,
+                events::NoEvent => break,
                 _ => (),
             }
         }
