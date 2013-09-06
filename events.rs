@@ -269,9 +269,8 @@ fn wrap_event(raw_event: ll::SDL_Event) -> Event {
         if type_ < ll::SDL_FIRSTEVENT || type_ > ll::SDL_LASTEVENT {
             return NoEvent;
         }
-        let common: &ll::Struct_SDL_CommonEvent = cast::transmute(event.common());
+        let common: &ll::Struct_SDL_CommonEvent = cast::transmute(raw_event.common());
         let timestamp = common.timestamp as Timestamp;
-        let type_ = *event._type();
         match type_ {
             ll::SDL_QUIT => Quit(timestamp),
             ll::SDL_APP_TERMINATING => AppTerminating(timestamp),
