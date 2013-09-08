@@ -1,4 +1,7 @@
-mod enum_set {
+#[macro_escape];
+
+#[macro_escape]
+pub mod enum_set {
     extern mod extra;
     pub use self::extra::enum_set::*;
     use std::cast;
@@ -22,6 +25,11 @@ mod enum_set {
         $( e.add($elem); )*
         e
     })()))
+
+    macro_rules! impl_clike (($T:ty) => (impl extra::enum_set::CLike for $T {
+        fn to_uint(&self) -> uint { *self as uint }
+        fn from_uint(e: uint) -> $T { unsafe { cast::transmute_copy(&e) } }
+    }))
 
     #[cfg(test)]
     mod test {
