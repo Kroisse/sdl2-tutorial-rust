@@ -3,6 +3,7 @@ mod enum_set {
     pub use self::extra::enum_set::*;
     pub use super::from_bytes::FromBytes;
     use std::to_bytes::ToBytes;
+    use std::cast;
 
     pub trait EnumSetUtil<E> {
         fn to_uint(&self) -> uint;
@@ -11,15 +12,10 @@ mod enum_set {
 
     impl<E: CLike> EnumSetUtil<E> for EnumSet<E> {
         fn to_uint(&self) -> uint {
-            let mut result = 0;
-            for i in self.iter() {
-                result |= bit(i);
-            }
-            result
+            unsafe { cast::transmute_copy(self) }
         }
         fn from_uint(v: uint) -> EnumSet<E> {
-            let bytes = v.to_bytes(true);
-            FromBytes::from_bytes(bytes, false)
+            unsafe { cast::transmute_copy(&v) }
         }
     }
 
@@ -112,7 +108,7 @@ mod from_bytes {
     pub trait FromBytes {
         fn from_bytes(bytes: &[u8], lsb0: bool) -> Self;
     }
-
+/*
     impl<N: Zero + Add<N, N> + Shl<N, N> + NumCast> FromBytes for N {
         fn from_bytes(bytes: &[u8], lsb0: bool) -> N {
             let mut result: N = Zero::zero();
@@ -160,5 +156,5 @@ mod from_bytes {
         num_test!(i16, test_i16)
         num_test!(u8, test_u8)
         num_test!(u16, test_u16)
-    }
+    }*/
 }
