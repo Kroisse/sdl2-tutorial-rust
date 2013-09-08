@@ -161,8 +161,20 @@ pub struct SysWMEvent {
 }
 */
 
-pub struct WindowMovedEventData { position: (int, int) }
-pub struct WindowResizedEventData { size: (uint, uint) }
+pub struct WindowEvent {
+    timestamp: Timestamp,
+    window_id: WindowID,
+}
+pub struct WindowMovedEvent {
+    timestamp: Timestamp,
+    window_id: WindowID,
+    position: (int, int),
+}
+pub struct WindowResizedEvent {
+    timestamp: Timestamp,
+    window_id: WindowID,
+    size: (uint, uint),
+}
 
 pub enum KeyState { KeyPressed, KeyReleased }
 pub struct KeyboardEvent {
@@ -187,20 +199,20 @@ pub enum Event {
     AppWillEnterForeground(Timestamp),
     AppDidEnterForeground(Timestamp),
     /* Window events */
-    WindowShown       (Timestamp, WindowID),
-    WindowHidden      (Timestamp, WindowID),
-    WindowExposed     (Timestamp, WindowID),
-    WindowMoved       (Timestamp, WindowID, WindowMovedEventData),
-    WindowResized     (Timestamp, WindowID, WindowResizedEventData),
-    WindowSizeChanged (Timestamp, WindowID),
-    WindowMinimized   (Timestamp, WindowID),
-    WindowMaximized   (Timestamp, WindowID),
-    WindowRestored    (Timestamp, WindowID),
-    WindowEnter       (Timestamp, WindowID),
-    WindowLeave       (Timestamp, WindowID),
-    WindowFocusGained (Timestamp, WindowID),
-    WindowFocusLost   (Timestamp, WindowID),
-    WindowClose       (Timestamp, WindowID),
+    WindowShown(WindowEvent),
+    WindowHidden(WindowEvent),
+    WindowExposed(WindowEvent),
+    WindowMoved(WindowMovedEvent),
+    WindowResized(WindowResizedEvent),
+    WindowSizeChanged(WindowEvent),
+    WindowMinimized(WindowEvent),
+    WindowMaximized(WindowEvent),
+    WindowRestored(WindowEvent),
+    WindowEnter(WindowEvent),
+    WindowLeave(WindowEvent),
+    WindowFocusGained(WindowEvent),
+    WindowFocusLost(WindowEvent),
+    WindowClose(WindowEvent),
     SysWMEvent(Timestamp),
     /* Keyboard events */
     KeyDown(KeyboardEvent),
@@ -331,20 +343,22 @@ fn wrap_windowevent(raw_event: ll::SDL_WindowEvent) -> Event {
     let t = e.timestamp;
     let w = e.windowID;
     match e.event as c_uint {
-        ll::SDL_WINDOWEVENT_SHOWN =>        WindowShown       (t, w),
-        ll::SDL_WINDOWEVENT_HIDDEN =>       WindowHidden      (t, w),
-        ll::SDL_WINDOWEVENT_EXPOSED =>      WindowExposed     (t, w),
-        ll::SDL_WINDOWEVENT_MOVED =>        WindowMoved       (t, w, WindowMovedEventData {position: (e.data1 as int, e.data2 as int)}),
-        ll::SDL_WINDOWEVENT_RESIZED =>      WindowResized     (t, w, WindowResizedEventData {size: (e.data1 as uint, e.data2 as uint)}),
-        ll::SDL_WINDOWEVENT_SIZE_CHANGED => WindowSizeChanged (t, w),
-        ll::SDL_WINDOWEVENT_MINIMIZED =>    WindowMinimized   (t, w),
-        ll::SDL_WINDOWEVENT_MAXIMIZED =>    WindowMaximized   (t, w),
-        ll::SDL_WINDOWEVENT_RESTORED =>     WindowRestored    (t, w),
-        ll::SDL_WINDOWEVENT_ENTER =>        WindowEnter       (t, w),
-        ll::SDL_WINDOWEVENT_LEAVE =>        WindowLeave       (t, w),
-        ll::SDL_WINDOWEVENT_FOCUS_GAINED => WindowFocusGained (t, w),
-        ll::SDL_WINDOWEVENT_FOCUS_LOST =>   WindowFocusLost   (t, w),
-        ll::SDL_WINDOWEVENT_CLOSE =>        WindowClose       (t, w),
+        ll::SDL_WINDOWEVENT_SHOWN =>        WindowShown(WindowEvent {timestamp: t, window_id: w}),
+        ll::SDL_WINDOWEVENT_HIDDEN =>       WindowHidden(WindowEvent {timestamp: t, window_id: w}),
+        ll::SDL_WINDOWEVENT_EXPOSED =>      WindowExposed(WindowEvent {timestamp: t, window_id: w}),
+        ll::SDL_WINDOWEVENT_MOVED =>
+            WindowMoved(WindowMovedEvent {timestamp: t, window_id: w, position: (e.data1 as int, e.data2 as int)}),
+        ll::SDL_WINDOWEVENT_RESIZED =>
+            WindowResized(WindowResizedEvent {timestamp: t, window_id: w, size: (e.data1 as uint, e.data2 as uint)}),
+        ll::SDL_WINDOWEVENT_SIZE_CHANGED => WindowSizeChanged(WindowEvent {timestamp: t, window_id: w}),
+        ll::SDL_WINDOWEVENT_MINIMIZED =>    WindowMinimized(WindowEvent {timestamp: t, window_id: w}),
+        ll::SDL_WINDOWEVENT_MAXIMIZED =>    WindowMaximized(WindowEvent {timestamp: t, window_id: w}),
+        ll::SDL_WINDOWEVENT_RESTORED =>     WindowRestored(WindowEvent {timestamp: t, window_id: w}),
+        ll::SDL_WINDOWEVENT_ENTER =>        WindowEnter(WindowEvent {timestamp: t, window_id: w}),
+        ll::SDL_WINDOWEVENT_LEAVE =>        WindowLeave(WindowEvent {timestamp: t, window_id: w}),
+        ll::SDL_WINDOWEVENT_FOCUS_GAINED => WindowFocusGained(WindowEvent {timestamp: t, window_id: w}),
+        ll::SDL_WINDOWEVENT_FOCUS_LOST =>   WindowFocusLost(WindowEvent {timestamp: t, window_id: w}),
+        ll::SDL_WINDOWEVENT_CLOSE =>        WindowClose(WindowEvent {timestamp: t, window_id: w}),
         _ => {
             debug!("std::events::wrap_windowevent() got unknown event %?", e);
             NoEvent
