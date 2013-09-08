@@ -2,20 +2,15 @@ use std::ptr;
 use std::cast;
 use std::libc::{c_uint};
 use super::ll;
+use super::scancode;
+use super::keycode;
+use super::util::enum_set::*;
 
 type Timestamp = u32;
 type WindowID = u32;
+
 /*
 pub struct CommonEvent { timestamp: Timestamp }
-pub struct KeyboardEvent {
-    timestamp: Timestamp,
-    windowID: Uint32,
-    state: Uint8,
-    repeat: Uint8,
-    padding2: Uint8,
-    padding3: Uint8,
-    keysym: SDL_Keysym,
-}
 pub struct TextEditingEvent {
     timestamp: Timestamp,
     windowID: Uint32,
@@ -169,6 +164,17 @@ pub struct SysWMEvent {
 pub struct WindowMovedEventData { position: (int, int) }
 pub struct WindowResizedEventData { size: (uint, uint) }
 
+pub enum KeyState { KeyPressed, KeyReleased }
+pub struct KeyboardEvent {
+    timestamp: Timestamp,
+    window_id: WindowID,
+    state: KeyState,
+    repeat: bool,
+    scancode: scancode::Scancode,
+    sym: keycode::Keycode,
+    modifiers: EnumSet<keycode::KeyModifier>,
+}
+
 pub enum Event {
     NoEvent,
     /* Application events */
@@ -197,8 +203,8 @@ pub enum Event {
     WindowClose       (Timestamp, WindowID),
     SysWMEvent(Timestamp),
     /* Keyboard events */
-    KeyDown(Timestamp),
-    KeyUp(Timestamp),
+    KeyDown(KeyboardEvent),
+    KeyUp(KeyboardEvent),
     TextEditing(Timestamp),
     TextInput(Timestamp),
     /* Mouse events */
@@ -284,8 +290,8 @@ fn wrap_event(raw_event: ll::SDL_Event) -> Event {
             ll::SDL_APP_DIDENTERFOREGROUND => AppDidEnterForeground(timestamp),
             ll::SDL_WINDOWEVENT => wrap_windowevent(*raw_event.window()),
             ll::SDL_SYSWMEVENT => SysWMEvent(timestamp),
-            ll::SDL_KEYDOWN => KeyDown(timestamp),
-            ll::SDL_KEYUP => KeyUp(timestamp),
+            ll::SDL_KEYDOWN => wrap_keyevent(*raw_event.key()),
+            ll::SDL_KEYUP => wrap_keyevent(*raw_event.key()),
             ll::SDL_TEXTEDITING => TextEditing(timestamp),
             ll::SDL_TEXTINPUT => TextInput(timestamp),
             ll::SDL_MOUSEMOTION => MouseMotion(timestamp),
@@ -341,6 +347,31 @@ fn wrap_windowevent(raw_event: ll::SDL_WindowEvent) -> Event {
         ll::SDL_WINDOWEVENT_CLOSE =>        WindowClose       (t, w),
         _ => {
             debug!("std::events::wrap_windowevent() got unknown event %?", e);
+            NoEvent
+        }
+    }
+}
+
+#[fixed_stack_segment]
+fn wrap_keyevent(raw_event: ll::SDL_KeyboardEvent) -> Event {
+    let e = KeyboardEvent {
+        timestamp: raw_event.timestamp,
+        window_id: raw_event.windowID,
+        state: match raw_event.state {
+            ll::SDL_PRESSED => KeyPressed,
+            ll::SDL_RELEASED => KeyReleased,
+            _ => fail!("std::events::wrap_keyevent() got unknown key state: %?", raw_event),
+        },
+        repeat: raw_event.repeat != 0,
+        scancode: unsafe { cast::transmute_copy(&(raw_event.keysym.scancode as uint)) },
+        sym: unsafe { cast::transmute_copy(&(raw_event.keysym.sym as uint)) },
+        modifiers: EnumSetUtil::from_uint(raw_event.keysym._mod as uint),
+    };
+    match raw_event._type {
+        ll::SDL_KEYDOWN => KeyDown(e),
+        ll::SDL_KEYUP => KeyUp(e),
+        _ => {
+            debug!("std::events::wrap_keyevent() got unknown event %?", e);
             NoEvent
         }
     }
