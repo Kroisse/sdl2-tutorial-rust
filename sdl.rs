@@ -8,6 +8,8 @@ pub mod window;
 pub mod render;
 pub mod surface;
 pub mod events;
+pub mod scancode;
+pub mod keycode;
 
 pub mod global;
 

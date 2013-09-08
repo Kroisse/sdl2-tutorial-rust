@@ -28,7 +28,7 @@ pub mod enum_set {
 
     macro_rules! impl_clike (($T:ty) => (impl extra::enum_set::CLike for $T {
         fn to_uint(&self) -> uint { *self as uint }
-        fn from_uint(e: uint) -> $T { unsafe { cast::transmute_copy(&e) } }
+        fn from_uint(value: uint) -> $T { unsafe { cast::transmute_copy(&value) } }
     }))
 
     #[cfg(test)]
