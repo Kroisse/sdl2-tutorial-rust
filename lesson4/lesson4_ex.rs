@@ -2,13 +2,13 @@
  * rustc 0.8-pre
  * host: x86_64-apple-darwin
  */
+extern mod sdl2;
 
-use sdl::window::{Window};
-use sdl::render::{Renderer, Texture};
-use sdl::ext::image::load_texture;
-use sdl::events;
-use sdl::keycode;
-mod sdl;
+use sdl2::window::{Window};
+use sdl2::render::{Renderer, Texture};
+use sdl2::ext::image::load_texture;
+use sdl2::events;
+use sdl2::keycode;
 
 static SCREEN_RESOLUTION: (uint, uint) = (960, 640);
 static speed: int = 10;
@@ -25,7 +25,7 @@ fn render_texture(texture: &Texture, renderer: &Renderer, position: (int, int)) 
 }
 
 fn main() {
-    sdl::init(sdl::SDL_INIT_EVERYTHING()).unwrap();
+    sdl2::init(sdl2::SDL_INIT_EVERYTHING()).unwrap();
     let w = match SCREEN_RESOLUTION {
         (w, h) => Window::new("Lesson 4 - extra", 0, 0, w, h).unwrap()
     };
@@ -58,7 +58,7 @@ fn main() {
         render_texture(image, ren, (x, y));
         ren.present();
     }
-    sdl::quit();
+    sdl2::quit();
 }
 
 // workaround

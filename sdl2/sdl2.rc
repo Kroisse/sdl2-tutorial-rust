@@ -1,3 +1,8 @@
+#[link(name="sdl2", vers="0.1", uuid="29771962-5672-4eba-b1ac-79a26c16bd71")];
+#[license = "MIT"];
+#[author = "Eunchong Yu <kroisse@gmail.com>"];
+#[crate_type = "lib"];
+
 pub use self::global::*;
 pub use self::rect::*;
 

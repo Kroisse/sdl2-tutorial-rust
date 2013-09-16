@@ -2,11 +2,11 @@
  * rustc 0.8-pre
  * host: x86_64-apple-darwin
  */
+extern mod sdl2;
 
-use sdl::window::{Window};
-use sdl::render::{Renderer, Texture};
-use sdl::ext::image::load_texture;
-mod sdl;
+use sdl2::window::{Window};
+use sdl2::render::{Renderer, Texture};
+use sdl2::ext::image::load_texture;
 
 static SCREEN_RESOLUTION: (uint, uint) = (960, 640);
 
@@ -21,7 +21,7 @@ fn apply_surface(x: int, y: int, texture: &Texture, renderer: &Renderer) {
 }
 
 fn main() {
-    sdl::init(sdl::SDL_INIT_EVERYTHING()).unwrap();
+    sdl2::init(sdl2::SDL_INIT_EVERYTHING()).unwrap();
     let w = match SCREEN_RESOLUTION {
         (w, h) => Window::new("Lesson 3", 0, 0, w, h).unwrap()
     };
@@ -44,5 +44,5 @@ fn main() {
     apply_surface(x, y, image, ren);
     
     ren.present();
-    sdl::delay(2000);
+    sdl2::delay(2000);
 }

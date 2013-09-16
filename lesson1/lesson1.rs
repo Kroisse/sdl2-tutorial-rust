@@ -3,18 +3,18 @@
  * host: x86_64-apple-darwin
  */
 
-mod sdl;
+extern mod sdl2;
 
 
 fn main() {
-    sdl::init(sdl::SDL_INIT_EVERYTHING()).unwrap();
-    let w = sdl::window::Window::new("Title", 0, 0, 960, 640).unwrap();
+    sdl2::init(sdl2::SDL_INIT_EVERYTHING()).unwrap();
+    let w = sdl2::window::Window::new("Title", 0, 0, 960, 640).unwrap();
     let ren = w.create_renderer(-1).unwrap();
-    let bmp = sdl::surface::Surface::from_bmp(&Path("res/hello.bmp")).unwrap();
+    let bmp = sdl2::surface::Surface::from_bmp(&Path("res/hello.bmp")).unwrap();
     let tex = ren.create_texture_from_surface(bmp).unwrap();
     ren.clear();
-    ren.copy_(tex, None);
+    ren.copy_(tex, &(), &());
     ren.present();
-    sdl::delay(2000);
+    sdl2::delay(2000);
     println("Hello?");
 }
