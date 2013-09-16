@@ -5,10 +5,12 @@
 
 pub use self::global::*;
 pub use self::rect::*;
+pub use self::pixels::*;
 
 pub mod util;
 
 pub mod rect;
+pub mod pixels;
 pub mod window;
 pub mod render;
 pub mod surface;
