@@ -1,7 +1,7 @@
 use std::ptr;
-use std::str::raw::from_c_str;
 
 use super::ll;
+use super::get_error;
 
 
 pub struct Surface {
@@ -28,7 +28,7 @@ impl Surface {
                 }
             };
             if ptr::is_null(p) {
-                return Err(from_c_str(ll::SDL_GetError()));
+                return Err(get_error());
             }
             Ok(~Surface {p_surface: p})
         }

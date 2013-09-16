@@ -32,18 +32,24 @@ pub fn SDL_INIT_EVERYTHING() -> EnumSet<InitFlag> {
 #[fixed_stack_segment]
 pub fn init(flags: EnumSet<InitFlag>) -> Result<(), ~str> {
     let raw_flag = flags.to_uint() as u32;
-    unsafe {
-        if ll::SDL_Init(raw_flag) < 0 {
-            let msg = ll::SDL_GetError();
-            return Err(from_c_str(msg));
-        }
+    if unsafe { ll::SDL_Init(raw_flag) } < 0 {
+        Err(get_error())
+    } else {
+        Ok(())
     }
-    Ok(())
 }
 
 #[fixed_stack_segment]
 pub fn quit() {
     unsafe { ll::SDL_Quit(); }
+}
+
+#[fixed_stack_segment]
+pub fn get_error() -> ~str {
+    unsafe {
+        let msg = ll::SDL_GetError();
+        from_c_str(msg)
+    }
 }
 
 #[fixed_stack_segment]

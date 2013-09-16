@@ -1,10 +1,10 @@
 use std::ptr;
-use std::str::raw::from_c_str;
 use std::libc::{c_int};
 
 use super::ll;
 use super::ToRect;
 use super::surface::Surface;
+use super::get_error;
 
 
 pub struct Renderer<'self> {
@@ -20,11 +20,10 @@ pub struct Texture<'self> {
 impl<'self> Renderer<'self> {
     #[fixed_stack_segment]
     pub fn create_texture_from_surface<'a>(&'a self, surface: &Surface) -> Result<~Texture<'a>, ~str> {
-        unsafe {
-            let p = ll::SDL_CreateTextureFromSurface(self.p_renderer, surface.p_surface);
-            if ptr::is_null(p) {
-                return Err(from_c_str(ll::SDL_GetError()));
-            }
+        let p = unsafe { ll::SDL_CreateTextureFromSurface(self.p_renderer, surface.p_surface) };
+        if ptr::is_null(p) {
+            Err(get_error())
+        } else {
             Ok(~Texture{ parent: self, p_texture: p })
         }
     }
@@ -62,12 +61,11 @@ impl<'self> Renderer<'self> {
 impl super::window::Window {
     #[fixed_stack_segment]
     pub fn create_renderer<'a>(&'a self, index: int) -> Result<~Renderer<'a>, ~str> {
-        unsafe {
-            let flags = ll::SDL_RENDERER_ACCELERATED | ll::SDL_RENDERER_PRESENTVSYNC;
-            let p = ll::SDL_CreateRenderer(self.p_window, index as c_int, flags);
-            if ptr::is_null(p) {
-                return Err(from_c_str(ll::SDL_GetError()));
-            }
+        let flags = ll::SDL_RENDERER_ACCELERATED | ll::SDL_RENDERER_PRESENTVSYNC;
+        let p = unsafe { ll::SDL_CreateRenderer(self.p_window, index as c_int, flags) };
+        if ptr::is_null(p) {
+            Err(get_error())
+        } else {
             Ok(~Renderer{ parent: self, p_renderer: p })
         }
     }
