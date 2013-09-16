@@ -1,17 +1,19 @@
-/* http://twinklebeardev.blogspot.kr/2012/07/lesson-3-sdl-extension-libraries.html
+/* http://twinklebeardev.blogspot.kr/2012/07/lesson-2-dont-put-everything-in-main.html
  * rustc 0.8-pre
  * host: x86_64-apple-darwin
  */
 
 use sdl::window::{Window};
 use sdl::render::{Renderer, Texture};
-use sdl::ext::image::load_texture;
+use sdl::surface::Surface;
 mod sdl;
 
 static SCREEN_RESOLUTION: (uint, uint) = (960, 640);
 
 fn load_image<'a>(renderer: &'a Renderer, file: &Path) -> Result<~Texture<'a>, ~str> {
-    load_texture(renderer, file)
+    do Surface::from_bmp(file).and_then |image| {
+        renderer.create_texture_from_surface(image)
+    }
 }
 
 fn apply_surface(x: int, y: int, texture: &Texture, renderer: &Renderer) {
@@ -23,11 +25,11 @@ fn apply_surface(x: int, y: int, texture: &Texture, renderer: &Renderer) {
 fn main() {
     sdl::init(sdl::SDL_INIT_EVERYTHING()).unwrap();
     let w = match SCREEN_RESOLUTION {
-        (w, h) => Window::new("Lesson 3", 0, 0, w, h).unwrap()
+        (w, h) => Window::new("Lesson 2", 0, 0, w, h).unwrap()
     };
     let ren = w.create_renderer(-1).unwrap();
-    let background = load_image(ren, &Path("Lesson3res/background.png")).unwrap();
-    let image = load_image(ren, &Path("Lesson3res/image.png")).unwrap();
+    let background = load_image(ren, &Path("res/background.bmp")).unwrap();
+    let image = load_image(ren, &Path("res/image.bmp")).unwrap();
 
     ren.clear();
     let (bw, bh) = background.size();

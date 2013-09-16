@@ -22,22 +22,29 @@ fn apply_surface(x: int, y: int, texture: &Texture, renderer: &Renderer) {
     renderer.copy_(texture, &(), &rect);
 }
 
+fn blit_background(size: (uint, uint), texture: &Texture, renderer: &Renderer) {
+    let (bw, bh) = texture.size();
+    let (bw, bh) = (bw as int, bh as int);
+    let (w, h) = match size { (w, h) => (w as int, h as int) };
+
+    for j in range(0, h / bh + 1) {
+        for i in range(0, w / bw + 1) {
+            apply_surface(i * bw, j * bh, texture, renderer);
+        }
+    }
+}
+
 fn main() {
     sdl::init(sdl::SDL_INIT_EVERYTHING()).unwrap();
     let w = match SCREEN_RESOLUTION {
         (w, h) => Window::new("Lesson 2", 0, 0, w, h).unwrap()
     };
     let ren = w.create_renderer(-1).unwrap();
-    let background = load_image(ren, &Path("Lesson2res/background.bmp")).unwrap();
-    let image = load_image(ren, &Path("Lesson2res/image.bmp")).unwrap();
+    let background = load_image(ren, &Path("res/background.bmp")).unwrap();
+    let image = load_image(ren, &Path("res/image.bmp")).unwrap();
 
     ren.clear();
-    let (bw, bh) = background.size();
-    let (bw, bh) = (bw as int, bh as int);
-    apply_surface(0, 0, background, ren);
-    apply_surface(bw, 0, background, ren);
-    apply_surface(0, bh, background, ren);
-    apply_surface(bw, bh, background, ren);
+    blit_background(SCREEN_RESOLUTION, background, ren);
 
     let (iw, ih) = image.size();
     let (x, y) = match SCREEN_RESOLUTION {

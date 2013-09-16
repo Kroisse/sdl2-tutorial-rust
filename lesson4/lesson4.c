@@ -29,7 +29,7 @@ int main(int argc, char *argv[]) {
         printf("%s\n", SDL_GetError());
         return 1;
     }
-    SDL_Window *window = SDL_CreateWindow("Lesson 2", SDL_WINDOWPOS_CENTERED,
+    SDL_Window *window = SDL_CreateWindow("Lesson 4", SDL_WINDOWPOS_CENTERED,
                                                       SDL_WINDOWPOS_CENTERED,
                                                       SCREEN_WIDTH,
                                                       SCREEN_HEIGHT,
@@ -44,7 +44,7 @@ int main(int argc, char *argv[]) {
         printf("%s\n", SDL_GetError());
         return 3;
     }
-    SDL_Texture *image = load_image(renderer, "Lesson4res/image.png");
+    SDL_Texture *image = load_image(renderer, "res/image.png");
 
     int quit = 0;
     SDL_Event e;

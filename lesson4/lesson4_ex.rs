@@ -30,7 +30,7 @@ fn main() {
         (w, h) => Window::new("Lesson 4 - extra", 0, 0, w, h).unwrap()
     };
     let ren = w.create_renderer(-1).unwrap();
-    let image = load_image(ren, &Path("Lesson4res/image.png")).unwrap();
+    let image = load_image(ren, &Path("res/image.png")).unwrap();
 
     let mut quit = false;
     let mut x = 0;

@@ -36,7 +36,7 @@ fn main() {
         (w, h) => Window::new("Lesson 5", 0, 0, w, h).unwrap()
     };
     let ren = w.create_renderer(-1).unwrap();
-    let image = load_image(ren, &Path("Lesson5res/image.png")).unwrap();
+    let image = load_image(ren, &Path("res/image.png")).unwrap();
 
     let (iw, ih) = (100, 100);
     let clips = do vec::build(Some(4)) |push| {
