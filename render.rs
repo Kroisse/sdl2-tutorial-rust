@@ -3,7 +3,7 @@ use std::str::raw::from_c_str;
 use std::libc::{c_int};
 
 use super::ll;
-use super::Rect;
+use super::MaybeRect;
 use super::surface::Surface;
 
 
@@ -37,13 +37,17 @@ impl<'self> Renderer<'self> {
     }
 
     #[fixed_stack_segment]
-    pub fn copy_(&self, texture: &Texture, dest: Option<&Rect>) {
+    pub fn copy_<T:MaybeRect, U:MaybeRect>(&self, texture: &Texture, src: &T, dest: &U) {
         unsafe {
-            let p_dest = match dest {
-                Some(rect) => ptr::to_unsafe_ptr(rect),
+            let p_src = match src.maybe_rect() {
+                Some(rect) => ptr::to_unsafe_ptr(&rect),
                 None => ptr::null(),
             };
-            ll::SDL_RenderCopy(self.p_renderer, texture.p_texture, ptr::null(), p_dest);
+            let p_dest = match dest.maybe_rect() {
+                Some(rect) => ptr::to_unsafe_ptr(&rect),
+                None => ptr::null(),
+            };
+            ll::SDL_RenderCopy(self.p_renderer, texture.p_texture, p_src, p_dest);
         }
     }
 
