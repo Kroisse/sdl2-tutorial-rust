@@ -1,2 +1,3 @@
 *.dSYM/
 /sdl2/*.dylib
+libsdl2.dummy
