@@ -11,15 +11,15 @@ mod sdl;
 static SCREEN_RESOLUTION: (uint, uint) = (960, 640);
 
 fn load_image<'a>(renderer: &'a Renderer, file: &Path) -> Result<~Texture<'a>, ~str> {
-    do Surface::from_bmp(file).chain |image| {
+    do Surface::from_bmp(file).and_then |image| {
         renderer.create_texture_from_surface(image)
     }
 }
 
 fn apply_surface(x: int, y: int, texture: &Texture, renderer: &Renderer) {
     let (w, h) = texture.size();
-    let rect = sdl::Rect(x, y, w, h);
-    renderer.copy_(texture, Some(&rect));
+    let rect = (x, y, w, h);
+    renderer.copy_(texture, &(), &rect);
 }
 
 fn blit_background(size: (uint, uint), texture: &Texture, renderer: &Renderer) {

@@ -18,14 +18,14 @@ fn load_image<'a>(renderer: &'a Renderer, file: &Path) -> Result<~Texture<'a>, ~
 fn render_texture(texture: &Texture, renderer: &Renderer, position: (int, int)) {
     let (x, y) = position;
     let (w, h) = texture.size();
-    let rect = sdl::Rect(x, y, w, h);
-    renderer.copy_(texture, Some(&rect));
+    let rect = (x, y, w, h);
+    renderer.copy_(texture, &(), &rect);
 }
 
 fn main() {
     sdl::init(sdl::SDL_INIT_EVERYTHING()).unwrap();
     let w = match SCREEN_RESOLUTION {
-        (w, h) => Window::new("Lesson 2", 0, 0, w, h).unwrap()
+        (w, h) => Window::new("Lesson 4", 0, 0, w, h).unwrap()
     };
     let ren = w.create_renderer(-1).unwrap();
     let image = load_image(ren, &Path("Lesson4res/image.png")).unwrap();
