@@ -1,11 +1,19 @@
 use std::ptr;
-use std::libc::{c_int};
+use std::libc::{c_int, c_double};
 
 use super::ll;
-use super::ToRect;
+use super::{ToRect, RawRect, ToPoint, RawPoint};
 use super::surface::Surface;
 use super::get_error;
 
+pub enum RendererFlip {
+    /** Do not flip */
+    FlipNone = 0x00000000,
+    /** flip horizontally */
+    FlipHorizontal = 0x00000001,
+    /** flip vertically */
+    FlipVertical = 0x00000002,
+}
 
 pub struct Renderer<'self> {
     priv parent: &'self super::window::Window,
@@ -47,6 +55,22 @@ impl<'self> Renderer<'self> {
                 None => ptr::null(),
             };
             ll::SDL_RenderCopy(self.p_renderer, texture.p_texture, p_src, p_dest);
+        }
+    }
+
+    #[fixed_stack_segment]
+    pub fn copy_ex<T:ToRect, U:ToRect, V:ToPoint>(&self, texture: &Texture, src: &T, dest: &U,
+                                                  angle: float, center: &V, flip: RendererFlip) {
+        unsafe {
+            do rect_with_unsafe_ptr(src) |p_src| {
+                do rect_with_unsafe_ptr(dest) |p_dest| {
+                    do point_with_unsafe_ptr(center) |p_center| {
+                        ll::SDL_RenderCopyEx(self.p_renderer, texture.p_texture,
+                                             p_src, p_dest, angle as c_double,
+                                             p_center, flip as ll::SDL_RendererFlip);
+                    }
+                }
+            }
         }
     }
 
@@ -104,4 +128,23 @@ impl<'self> Drop for Texture<'self> {
             ll::SDL_DestroyTexture(self.p_texture);
         }
     }
+}
+
+unsafe fn rect_with_unsafe_ptr<T:ToRect>(rect: &T, cb: &fn(*RawRect)) {
+    let rect = rect.to_rect();
+    let p = match rect {
+        Some(r) => ptr::to_unsafe_ptr(&r),
+        None => ptr::null(),
+    };
+    cb(p);
+}
+
+
+unsafe fn point_with_unsafe_ptr<T:ToPoint>(point: &T, cb: &fn(*RawPoint)) {
+    let point = point.to_point();
+    let p = match point {
+        Some(t) => ptr::to_unsafe_ptr(&t),
+        None => ptr::null(),
+    };
+    cb(p);
 }
