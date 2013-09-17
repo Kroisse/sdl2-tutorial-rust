@@ -4,7 +4,7 @@
  */
 extern mod sdl2;
 
-use sdl2::window;
+use sdl2::video;
 use sdl2::render::{Renderer, Texture, RendererFlip, FlipNone, FlipVertical};
 use sdl2::ext::image::load_texture;
 use sdl2::ext::ttf;
@@ -17,7 +17,7 @@ static SCREEN_RESOLUTION: (uint, uint) = (960, 640);
 static speed: int = 10;
 
 struct Window<'self> {
-    window: ~window::Window,
+    window: ~video::Window,
     renderer: ~Renderer<'self>,
 }
 
@@ -30,7 +30,7 @@ impl<'self> Window<'self> {
             return Err(initialized.unwrap_err());
         }
         let (w, h) = SCREEN_RESOLUTION;
-        let win = match window::Window::new(title, 0, 0, w, h) {
+        let win = match video::Window::new(title, 0, 0, w, h) {
             Ok(w) => w,
             Err(e) => return Err(e),
         };

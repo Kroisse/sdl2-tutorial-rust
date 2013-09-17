@@ -8,7 +8,7 @@ extern mod sdl2;
 
 fn main() {
     sdl2::init(sdl2::SDL_INIT_EVERYTHING()).unwrap();
-    let w = sdl2::window::Window::new("Title", 0, 0, 960, 640).unwrap();
+    let w = sdl2::video::Window::new("Title", 0, 0, 960, 640).unwrap();
     let ren = w.create_renderer(-1).unwrap();
     let bmp = sdl2::surface::Surface::from_bmp(&Path("res/hello.bmp")).unwrap();
     let tex = ren.create_texture_from_surface(bmp).unwrap();

@@ -16,7 +16,7 @@ pub enum RendererFlip {
 }
 
 pub struct Renderer<'self> {
-    priv parent: &'self super::window::Window,
+    priv parent: &'self super::video::Window,
     p_renderer: *mut ll::SDL_Renderer,
 }
 
@@ -82,7 +82,7 @@ impl<'self> Renderer<'self> {
     }
 }
 
-impl super::window::Window {
+impl super::video::Window {
     #[fixed_stack_segment]
     pub fn create_renderer<'a>(&'a self, index: int) -> Result<~Renderer<'a>, ~str> {
         let flags = ll::SDL_RENDERER_ACCELERATED | ll::SDL_RENDERER_PRESENTVSYNC;

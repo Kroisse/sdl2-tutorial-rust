@@ -4,7 +4,7 @@
  */
 extern mod sdl2;
 
-use sdl2::window::{Window};
+use sdl2::video::{Window};
 use sdl2::render::{Renderer, Texture};
 use sdl2::ext::image::load_texture;
 use sdl2::ext::ttf;

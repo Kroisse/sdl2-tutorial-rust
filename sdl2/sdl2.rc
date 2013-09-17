@@ -11,7 +11,7 @@ pub mod util;
 
 pub mod rect;
 pub mod pixels;
-pub mod window;
+pub mod video;
 pub mod render;
 pub mod surface;
 pub mod events;
