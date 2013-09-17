@@ -26,6 +26,18 @@ impl Window {
             Ok(~Window{ p_window: p })
         }
     }
+
+    #[fixed_stack_segment]
+    pub fn size(&self) -> (uint, uint) {
+        let mut w = 0;
+        let mut h = 0;
+        unsafe {
+            ll::SDL_GetWindowSize(self.p_window,
+                ptr::to_mut_unsafe_ptr(&mut w),
+                ptr::to_mut_unsafe_ptr(&mut h));
+        }
+        (w as uint, h as uint)
+    }
 }
 
 impl Drop for Window {
