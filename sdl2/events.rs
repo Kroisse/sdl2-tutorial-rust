@@ -161,29 +161,29 @@ pub struct SysWMEvent {
 */
 
 pub struct WindowEvent {
-    timestamp: Timestamp,
-    window_id: WindowID,
+    pub timestamp: Timestamp,
+    pub window_id: WindowID,
 }
 pub struct WindowMovedEvent {
-    timestamp: Timestamp,
-    window_id: WindowID,
-    position: (int, int),
+    pub timestamp: Timestamp,
+    pub window_id: WindowID,
+    pub position: (int, int),
 }
 pub struct WindowResizedEvent {
-    timestamp: Timestamp,
-    window_id: WindowID,
-    size: (uint, uint),
+    pub timestamp: Timestamp,
+    pub window_id: WindowID,
+    pub size: (uint, uint),
 }
 
 pub enum KeyState { KeyPressed, KeyReleased }
 pub struct KeyboardEvent {
-    timestamp: Timestamp,
-    window_id: WindowID,
-    state: KeyState,
-    repeat: bool,
-    scancode: scancode::Scancode,
-    sym: keycode::Keycode,
-    modifiers: EnumSet<keycode::KeyModifier>,
+    pub timestamp: Timestamp,
+    pub window_id: WindowID,
+    pub state: KeyState,
+    pub repeat: bool,
+    pub scancode: scancode::Scancode,
+    pub sym: keycode::Keycode,
+    pub modifiers: EnumSet<keycode::KeyModifier>,
 }
 
 pub enum Event {

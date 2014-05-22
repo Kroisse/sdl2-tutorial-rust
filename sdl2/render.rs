@@ -42,7 +42,7 @@ impl<'s> Renderer<'s> {
         }
     }
 
-        pub fn copy_<T:ToRect, U:ToRect>(&self, texture: &Texture, src: &T, dest: &U) {
+    pub fn copy_<T:ToRect, U:ToRect>(&self, texture: &Texture, src: T, dest: U) {
         unsafe {
             let p_src = match src.to_rect() {
                 Some(rect) => &rect as *_,
@@ -56,12 +56,12 @@ impl<'s> Renderer<'s> {
         }
     }
 
-        pub fn copy_ex<T:ToRect, U:ToRect, V:ToPoint>(&self, texture: &Texture, src: &T, dest: &U,
-                                                  angle: f64, center: &V, flip: RendererFlip) {
+    pub fn copy_ex<T:ToRect, U:ToRect, V:ToPoint>(&self, texture: &Texture, src: T, dest: U,
+                                                  angle: f64, center: V, flip: RendererFlip) {
         unsafe {
-            rect_with_unsafe_ptr(src, |p_src| {
-                rect_with_unsafe_ptr(dest, |p_dest| {
-                    point_with_unsafe_ptr(center, |p_center| {
+            rect_with_unsafe_ptr(&src, |p_src| {
+                rect_with_unsafe_ptr(&dest, |p_dest| {
+                    point_with_unsafe_ptr(&center, |p_center| {
                         ll::SDL_RenderCopyEx(self.p_renderer, texture.p_texture,
                                              p_src, p_dest, angle as c_double,
                                              p_center, flip as ll::SDL_RendererFlip);
@@ -124,7 +124,7 @@ impl<'a> Drop for Texture<'a> {
     }
 }
 
-unsafe fn rect_with_unsafe_ptr<T:ToRect>(rect: &T, cb: |*RawRect|) {
+unsafe fn rect_with_unsafe_ptr<T:ToRect>(rect: T, cb: |*RawRect|) {
     let rect = rect.to_rect();
     let p = match rect {
         Some(r) => &r as *_,
@@ -134,7 +134,7 @@ unsafe fn rect_with_unsafe_ptr<T:ToRect>(rect: &T, cb: |*RawRect|) {
 }
 
 
-unsafe fn point_with_unsafe_ptr<T:ToPoint>(point: &T, cb: |*RawPoint|) {
+unsafe fn point_with_unsafe_ptr<T:ToPoint>(point: T, cb: |*RawPoint|) {
     let point = point.to_point();
     let p = match point {
         Some(t) => &t as *_,
