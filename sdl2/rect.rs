@@ -1,4 +1,4 @@
-use std::libc::{c_int};
+use libc::{c_int};
 
 pub type RawPoint = super::ll::SDL_Point;
 pub type RawSize = (uint, uint);
@@ -69,18 +69,13 @@ impl ToSize for (int, int, uint, uint) {
     }
 }
 
-#[cfg(test)]
-mod test {
-    use super::*;
+#[test]
+fn test_raw_rect() {
+    let r = RawRect(1, 2, 3, 4);
+    assert!(r == r.to_rect().unwrap());
+}
 
-    #[test]
-    fn test_raw_rect() {
-        let r = RawRect(1, 2, 3, 4);
-        assert_eq!(r, r.to_rect().unwrap());
-    }
-
-    #[test]
-    fn test_tuple() {
-        assert_eq!((1, 2, 3, 4).to_rect().unwrap(), RawRect(1, 2, 3, 4));
-    }
+#[test]
+fn test_tuple() {
+    assert!((1, 2, 3, 4).to_rect().unwrap() == RawRect(1, 2, 3, 4));
 }

@@ -1,10 +1,11 @@
-#[macro_escape];
+#![macro_escape]
 
-#[macro_escape]
 pub mod enum_set {
-    extern mod extra;
-    pub use self::extra::enum_set::*;
-    use std::cast;
+    #![macro_escape]
+
+    extern crate collections;
+    pub use collections::enum_set::{EnumSet, Items, CLike};
+    use std::mem;
 
     pub trait EnumSetUtil<E> {
         fn to_uint(&self) -> uint;
@@ -13,10 +14,10 @@ pub mod enum_set {
 
     impl<E: CLike> EnumSetUtil<E> for EnumSet<E> {
         fn to_uint(&self) -> uint {
-            unsafe { cast::transmute_copy(self) }
+            unsafe { mem::transmute_copy(self) }
         }
         fn from_uint(v: uint) -> EnumSet<E> {
-            unsafe { cast::transmute_copy(&v) }
+            unsafe { mem::transmute_copy(&v) }
         }
     }
 
@@ -26,33 +27,31 @@ pub mod enum_set {
         e
     })()))
 
-    macro_rules! impl_clike (($T:ty) => (impl extra::enum_set::CLike for $T {
+    macro_rules! impl_clike (($T:ty) => (impl collections::enum_set::CLike for $T {
         fn to_uint(&self) -> uint { *self as uint }
-        fn from_uint(value: uint) -> $T { unsafe { cast::transmute_copy(&value) } }
+        fn from_uint(value: uint) -> $T { FromPrimitive::from_uint(value).unwrap() }
     }))
 
     #[cfg(test)]
-    mod test {
-        use super::*;
+    pub fn bit<E: CLike>(e: E) -> uint {
+        1 << e.to_uint()
+    }
 
-        #[deriving(Eq)]
+    #[cfg(test)]
+    mod test {
+        use super::{EnumSet, EnumSetUtil, CLike};
+
+        #[deriving(Eq, FromPrimitive)]
         enum Fruit { Apple, Banana, Orange }
         impl CLike for Fruit {
             fn to_uint(&self) -> uint { *self as uint }
-            fn from_uint(e: uint) -> Fruit {
-                match e {
-                    0 => Apple,
-                    1 => Banana,
-                    2 => Orange,
-                    _ => fail!("Unknown index: %u", e),
-                }
-            }
+            fn from_uint(e: uint) -> Fruit { FromPrimitive::from_uint(e).unwrap() }
         }
 
         #[test]
         fn test_enum_set_macro() {
             let e: EnumSet<Fruit> = enum_set!(Banana|Orange);
-            assert!(e.iter().collect::<~[Fruit]>() == ~[Banana, Orange]);
+            assert!(e.iter().collect::<Vec<_>>().as_slice() == [Banana, Orange]);
         }
 
         #[test]

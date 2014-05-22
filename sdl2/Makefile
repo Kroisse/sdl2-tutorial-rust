@@ -8,16 +8,16 @@ RUSTFLAGS += --cfg ext_ttf
 
 all: libsdl2.dummy
 
-libsdl2.dummy: sdl2.rc $(RUST_SRC)
-	$(RUSTC) $(RUSTFLAGS) $< -o $@
+libsdl2.dummy: lib.rs $(RUST_SRC)
+	$(RUSTC) $(RUSTFLAGS) $<
 	touch $@
 
 test: test~
 	./test~
 
-test~: sdl2.rc $(RUST_SRC)
+test~: lib.rs $(RUST_SRC)
 	$(RUSTC) $(RUSTFLAGS) --cfg test --test $< -o $@
 
 clean:
-	rm -f *.dylib *.dummy test~
+	rm -f *.dylib *.rlib *.dummy *.o *.bc test~
 	rm -rf *.dSYM

@@ -1,16 +1,13 @@
-use std::ptr;
-
 use super::ll;
 use super::get_error;
 
 
 pub struct Surface {
-    p_surface: *mut ll::SDL_Surface,
+    pub p_surface: *mut ll::SDL_Surface,
 }
 
 impl Drop for Surface {
-    #[fixed_stack_segment]
-    fn drop(&self) {
+        fn drop(&mut self) {
         unsafe {
             ll::SDL_FreeSurface(self.p_surface);
         }
@@ -18,19 +15,18 @@ impl Drop for Surface {
 }
 
 impl Surface {
-    #[fixed_stack_segment]
-    pub fn from_bmp(path: &Path) -> Result<~Surface, ~str> {
+        pub fn from_bmp(path: &Path) -> Result<Surface, StrBuf> {
         unsafe {
             let mode = "rb".to_c_str();
-            let p = do mode.with_ref |mode| {
-                do path.with_c_str |file| {
+            let p = mode.with_ref(|mode| {
+                path.with_c_str(|file| {
                     ll::SDL_LoadBMP_RW(ll::SDL_RWFromFile(file, mode), 1)
-                }
-            };
-            if ptr::is_null(p) {
+                })
+            });
+            if p.is_null() {
                 return Err(get_error());
             }
-            Ok(~Surface {p_surface: p})
+            Ok(Surface {p_surface: p})
         }
     }
 }

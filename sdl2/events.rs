@@ -1,13 +1,12 @@
-use std::ptr;
-use std::cast;
-use std::libc::{c_uint};
+use std::mem;
+use libc::{c_uint};
 use super::ll;
 use super::scancode;
 use super::keycode;
-use super::util::enum_set::*;
+use util::enum_set::{EnumSet, EnumSetUtil};
 
-type Timestamp = u32;
-type WindowID = u32;
+pub type Timestamp = u32;
+pub type WindowID = u32;
 
 /*
 pub struct CommonEvent { timestamp: Timestamp }
@@ -258,15 +257,13 @@ pub enum Event {
 }
 
 fn null_event() -> ll::SDL_Event {
-    ll::Union_SDL_Event { data: [0u8, ..56] }
+    ll::Union_SDL_Event::new()
 }
 
-#[fixed_stack_segment]
 pub fn pump() {
     unsafe { ll::SDL_PumpEvents(); }
 }
 
-#[fixed_stack_segment]
 pub fn poll() -> Event {
     let mut event = null_event();
     let polled = unsafe { ll::SDL_PollEvent(&mut event) };
@@ -277,12 +274,11 @@ pub fn poll() -> Event {
     wrap_event(event)
 }
 
-#[fixed_stack_segment]
 fn wrap_event(raw_event: ll::SDL_Event) -> Event {
     let mut raw_event = raw_event;
     unsafe {
         let type_ = raw_event._type();
-        let type_ = if ptr::is_null(type_) {
+        let type_ = if type_.is_null() {
             return NoEvent;
         } else {
             *type_
@@ -290,7 +286,7 @@ fn wrap_event(raw_event: ll::SDL_Event) -> Event {
         if type_ < ll::SDL_FIRSTEVENT || type_ > ll::SDL_LASTEVENT {
             return NoEvent;
         }
-        let common: &ll::Struct_SDL_CommonEvent = cast::transmute(raw_event.common());
+        let common: &ll::Struct_SDL_CommonEvent = mem::transmute(raw_event.common());
         let timestamp = common.timestamp as Timestamp;
         match type_ {
             ll::SDL_QUIT => Quit(timestamp),
@@ -332,12 +328,11 @@ fn wrap_event(raw_event: ll::SDL_Event) -> Event {
             ll::SDL_CLIPBOARDUPDATE => ClipboardUpdate(timestamp),
             ll::SDL_DROPFILE => DropFile(timestamp),
             ll::SDL_USEREVENT => UserEvent(timestamp),
-            _ => fail!("std::events::poll() couldn't handle event type: %?", type_),
+            _ => fail!("std::events::poll() couldn't handle event type: {:?}", type_),
         }
     }
 }
 
-#[fixed_stack_segment]
 fn wrap_windowevent(raw_event: ll::SDL_WindowEvent) -> Event {
     let e = raw_event;
     let t = e.timestamp;
@@ -360,13 +355,12 @@ fn wrap_windowevent(raw_event: ll::SDL_WindowEvent) -> Event {
         ll::SDL_WINDOWEVENT_FOCUS_LOST =>   WindowFocusLost(WindowEvent {timestamp: t, window_id: w}),
         ll::SDL_WINDOWEVENT_CLOSE =>        WindowClose(WindowEvent {timestamp: t, window_id: w}),
         _ => {
-            debug!("std::events::wrap_windowevent() got unknown event %?", e);
+            debug!("std::events::wrap_windowevent() got unknown event {:?}", e);
             NoEvent
         }
     }
 }
 
-#[fixed_stack_segment]
 fn wrap_keyevent(raw_event: ll::SDL_KeyboardEvent) -> Event {
     let e = KeyboardEvent {
         timestamp: raw_event.timestamp,
@@ -374,18 +368,18 @@ fn wrap_keyevent(raw_event: ll::SDL_KeyboardEvent) -> Event {
         state: match raw_event.state {
             ll::SDL_PRESSED => KeyPressed,
             ll::SDL_RELEASED => KeyReleased,
-            _ => fail!("std::events::wrap_keyevent() got unknown key state: %?", raw_event),
+            _ => fail!("std::events::wrap_keyevent() got unknown key state: {:?}", raw_event),
         },
         repeat: raw_event.repeat != 0,
-        scancode: unsafe { cast::transmute_copy(&(raw_event.keysym.scancode as uint)) },
-        sym: unsafe { cast::transmute_copy(&(raw_event.keysym.sym as uint)) },
+        scancode: unsafe { mem::transmute_copy(&(raw_event.keysym.scancode as uint)) },
+        sym: unsafe { mem::transmute_copy(&(raw_event.keysym.sym as uint)) },
         modifiers: EnumSetUtil::from_uint(raw_event.keysym._mod as uint),
     };
     match raw_event._type {
         ll::SDL_KEYDOWN => KeyDown(e),
         ll::SDL_KEYUP => KeyUp(e),
         _ => {
-            debug!("std::events::wrap_keyevent() got unknown event %?", e);
+            debug!("std::events::wrap_keyevent() got unknown event {:?}", e);
             NoEvent
         }
     }
