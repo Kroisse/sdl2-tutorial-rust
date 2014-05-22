@@ -14,15 +14,13 @@ use sdl2::rect::*;
 use sdl2::pixels::*;
 
 static SCREEN_RESOLUTION: (uint, uint) = (960, 640);
-static speed: int = 10;
 
-struct Window<'self> {
-    window: ~video::Window,
-    renderer: ~Renderer<'self>,
+struct GameContext {
+    win: ~video::Window,
 }
 
-impl<'self> Window<'self> {
-    fn new(title: &str) -> Result<~Window, ~str> {
+impl GameContext {
+    fn new(title: &str) -> Result<GameContext, ~str> {
         let initialized = do sdl2::init(sdl2::SDL_INIT_EVERYTHING()).and_then |_| {
             ttf::init()
         };
@@ -30,61 +28,68 @@ impl<'self> Window<'self> {
             return Err(initialized.unwrap_err());
         }
         let (w, h) = SCREEN_RESOLUTION;
-        let win = match video::Window::new(title, 0, 0, w, h) {
-            Ok(w) => w,
-            Err(e) => return Err(e),
-        };
-        let ren = match win.create_renderer::<'self>(-1) {
-            Ok(r) => r,
-            Err(e) => return Err(e),
-        };
-        Ok(~Window {window: win, renderer: ren})
-    }
-    
-    fn draw<D: ToRect, E: ToRect>(&self, texture: &Texture, dest: &D, clip: &E,
-                                  angle: float, pivot: (int, int), flip: RendererFlip) {
-        let dest = dest.to_rect().unwrap();
-        let pivot = match pivot {
-            (x, y) => (x + dest.w as int / 2, y + dest.h as int / 2)
-        };
-        self.renderer.copy_ex(texture, clip, &dest, angle, &pivot, flip);
-    }
-    
-    fn load_image<'a>(&'a self, file: &Path) -> Result<~Texture<'a>, ~str> {
-        load_texture(self.renderer, file)
-    }
-    
-    fn render_text<'a>(&'a self, message: &str, font_path: &Path,
-                       color: Color, font_size: int) -> Result<~Texture<'a>, ~str> {
-        do ttf::Font::new(font_path, font_size).and_then |font| {
-            do font.render_blended(message, color).and_then |surf| {
-                self.renderer.create_texture_from_surface(surf)
-            }
+        match video::Window::new(title, 0, 0, w, h) {
+            Ok(w) => Ok(GameContext{win: w}),
+            Err(e) => Err(e),
         }
     }
 
-    fn clear(&self) { self.renderer.clear() }
-
-    fn present(&self) { self.renderer.present() }
-
-    fn size(&self) -> (uint, uint) { self.window.size() }
+    fn window<'a>(&'a self) -> &'a video::Window {
+        borrow(self.win)
+    }
 }
 
-#[unsafe_destructor]
-impl<'self> Drop for Window<'self> {
+fn borrow<'a, T>(v: &'a T) -> &'a T { v }
+
+impl Drop for GameContext {
     fn drop(&self) {
         ttf::quit();
         sdl2::quit();
     }
 }
 
+trait RendererUtil {
+    fn draw<D: ToRect, E: ToRect>(&self, texture: &Texture, dest: &D, clip: &E,
+                                  angle: float, pivot: (int, int), flip: RendererFlip);
+    fn load_image<'a>(&'a self, file: &Path) -> Result<~Texture<'a>, ~str>;
+    fn render_text<'a>(&'a self, message: &str, font_path: &Path,
+                       color: Color, font_size: int) -> Result<~Texture<'a>, ~str>;
+}
+
+impl<'self> RendererUtil for Renderer<'self> {
+    fn draw<D: ToRect, E: ToRect>(&self, texture: &Texture, dest: &D, clip: &E,
+                                  angle: float, pivot: (int, int), flip: RendererFlip) {
+        let dest = dest.to_rect().unwrap();
+        let pivot = match pivot {
+            (x, y) => (x + dest.w as int / 2, y + dest.h as int / 2)
+        };
+        self.copy_ex(texture, clip, &dest, angle, &pivot, flip);
+    }
+    
+    fn load_image<'a>(&'a self, file: &Path) -> Result<~Texture<'a>, ~str> {
+        load_texture(self, file)
+    }
+    
+    fn render_text<'a>(&'a self, message: &str, font_path: &Path,
+                       color: Color, font_size: int) -> Result<~Texture<'a>, ~str> {
+        do ttf::Font::new(font_path, font_size).and_then |font| {
+            do font.render_blended(message, color).and_then |surf| {
+                self.create_texture_from_surface(surf)
+            }
+        }
+    }
+}
+
+
 fn main() {
-    let win = Window::new("Lesson 7").unwrap();
-    let img = win.load_image(&Path("res/image.png")).unwrap();
+    let ctx = GameContext::new("Lesson 7").unwrap();
+    let win = ctx.window();
+    let ren = win.create_renderer(-1).unwrap();
+    let img = ren.load_image(&Path("res/image.png")).unwrap();
     let font_path = Path("res/SourceSansPro-Regular.ttf");
     let text = "TTF Fonts too!";
     let color = RGBA(255, 255, 255, 255);
-    let msg = win.render_text(text, &font_path, color, 25).unwrap();
+    let msg = ren.render_text(text, &font_path, color, 25).unwrap();
 
     let pos = match win.size() {
         (w, h) => (w as int / 2 - 150 / 2, h as int / 2 - 150 / 2, 150u, 150u)
@@ -109,10 +114,10 @@ fn main() {
                 _ => (),
             }
         }
-        win.clear();
-        win.draw(img, &pos, &(), angle, (0, 0), FlipNone);
-        win.draw(img, &pos, &(), angle, (0, 0), FlipVertical);
-        win.present();
+        ren.clear();
+        ren.draw(img, &pos, &(), angle, (0, 0), FlipNone);
+        ren.draw(msg, &pos, &(), angle, (0, 0), FlipVertical);
+        ren.present();
     }
 }
 

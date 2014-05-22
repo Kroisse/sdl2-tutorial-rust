@@ -1,4 +1,5 @@
 use std::ptr;
+use std::cast;
 use std::libc::{c_int, c_double};
 
 use super::ll;
@@ -16,8 +17,7 @@ pub enum RendererFlip {
 }
 
 pub struct Renderer<'self> {
-    priv parent: &'self super::video::Window,
-    p_renderer: *mut ll::SDL_Renderer,
+    p_renderer: &'self mut ll::SDL_Renderer,
 }
 
 pub struct Texture<'self> {
@@ -86,11 +86,11 @@ impl super::video::Window {
     #[fixed_stack_segment]
     pub fn create_renderer<'a>(&'a self, index: int) -> Result<~Renderer<'a>, ~str> {
         let flags = ll::SDL_RENDERER_ACCELERATED | ll::SDL_RENDERER_PRESENTVSYNC;
-        let p = unsafe { ll::SDL_CreateRenderer(self.p_window, index as c_int, flags) };
-        if ptr::is_null(p) {
-            Err(get_error())
-        } else {
-            Ok(~Renderer{ parent: self, p_renderer: p })
+        unsafe {
+            match ll::SDL_CreateRenderer(self.p_window, index as c_int, flags).to_option() {
+                Some(ren) => Ok(~Renderer{ p_renderer: cast::transmute_mut(ren) }),
+                None => Err(get_error()),
+            }
         }
     }
 }
